@@ -1,0 +1,52 @@
+@(blog: au.id.jazzy.erqx.engine.models.Blog,
+    router: au.id.jazzy.erqx.engine.controllers.BlogReverseRouter,
+    title: Option[String])(content: Html)(implicit req: RequestHeader, messages: Messages)
+
+<!DOCTYPE html>
+<html lang="@blog.info.language">
+  <head>
+    @blog.info.theme.head(blog, router, title)
+  </head>
+  <body>
+
+    <div class="container">
+
+      <div class="row">
+
+        <input type="checkbox" class="slideout-check" id="slideout-check" />
+
+        <div class="main col-xs-12 col-sm-8">
+
+          <header>
+            <h1><a href="@router.index()">@blog.info.title</a></h1>
+
+            @for(subTitle <- blog.info.subTitle) {
+              <h2>@subTitle</h2>
+            }
+          </header>
+
+          <label for="slideout-check" class="slideout-tab">@messages("about")</label>
+          @content
+        </div>
+        <div class="slideout col-sm-4">
+
+          @for(description <- blog.info.description) {
+            <header>
+              <h2>@messages("about")</h2>
+            </header>
+
+            <div class="description">
+              @Html(description)
+            </div>
+          }
+
+          <nav>
+            @blog.info.theme.navigation(blog, router)
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    @blog.info.theme.footer(blog, router)
+  </body>
+</html>

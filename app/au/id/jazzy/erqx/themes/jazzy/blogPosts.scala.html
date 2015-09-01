@@ -1,0 +1,47 @@
+@(blog: au.id.jazzy.erqx.engine.models.Blog,
+    router: au.id.jazzy.erqx.engine.controllers.BlogReverseRouter,
+    title: Option[String],
+    posts: List[(au.id.jazzy.erqx.engine.models.BlogPost, String)],
+    previous: Option[Call],
+    next: Option[Call])(implicit req: RequestHeader, messages: Messages)
+
+@nav(call: Option[Call], text: Html) = {
+  @call match {
+    case Some(u) => {
+      <li><a href="@u">@text</a></li>
+    }
+    case None => {
+      <li class="disabled"><a href="#" onclick="return false;">@text</a></li>
+    }
+  }
+}
+
+@blog.info.theme.main(blog, router, title) {
+
+  <nav>
+    @if(previous.isDefined || next.isDefined) {
+      <ul class="pagination pagination-sm">
+        @nav(previous, Html("&laquo;"))
+        @nav(next, Html("&raquo;"))
+      </ul>
+    }
+
+    @for(t <- title) {
+      <h2>@t</h2>
+    }
+  </nav>
+
+  <div class="posts">
+  @for((post, content) <- posts) {
+    <article>
+      <h1 class="postTitle"><a href="@router.view(post)">@post.title</a></h1>
+      <div class="postDate">@messages("blog.posted.date", post.date.toDate)</div>
+
+      <div class="postContent">
+        @Html(content)
+      </div>
+
+    </article>
+  }
+  </div>
+}

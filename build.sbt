@@ -1,25 +1,61 @@
-name := """mazz-blog"""
+name := "mazz-blog"
 
-version := "1.0-SNAPSHOT"
+organization := "au.id.jazzy.erqx"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.6"
 
+releaseSettings
+
+ReleaseKeys.crossBuild := true
+
+LessKeys.compress := true
+
+publishTo := {
+  val localRepo = new File("../jroper.github.io/").getAbsoluteFile
+  if (version.value.trim.endsWith("SNAPSHOT"))
+    Some(Resolver.file("snapshots", localRepo / "snapshots"))
+  else
+    Some(Resolver.file("releases", localRepo / "releases"))
+}
+
+// Production dependencies
 libraryDependencies ++= Seq(
-  jdbc,
-  cache,
-  ws,
-  specs2 % Test,
-  "org.specs2" %% "specs2-core" % "3.6.4"
+  "com.typesafe.play" %% "play-doc" % "1.2.1",
+  "org.eclipse.jgit" % "org.eclipse.jgit" % "3.7.0.201502260915-r",
+  "org.yaml" % "snakeyaml" % "1.12"
 )
 
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+// Web dependencies
+libraryDependencies ++= Seq(
+  "org.webjars" % "bootstrap" % "3.2.0",
+  "org.webjars" % "prettify" % "4-Mar-2013",
+  "org.webjars" % "retinajs" % "0.0.2"
+)
 
-// erqx dependency
-resolvers += "ERQX Releases" at "https://jroper.github.io/releases"
-libraryDependencies += "au.id.jazzy.erqx" %% "erqx-engine" % "1.0.0"
+// Test dependencies
+libraryDependencies ++= Seq(
+  "radeox" % "radeox" % "1.0-b2" % "test",
+  specs2
+)
 
-// Play provides two styles of routers, one expects its actions to be injected, the
-// other, legacy style, accesses its actions statically.
-routesGenerator := InjectedRoutesGenerator
+// Version file
+sourceGenerators in Compile <+= sourceManaged in Compile map { dir =>
+  val hash = ("git rev-parse HEAD" !!).trim
+  val file = dir / "au" / "id" / "jazzy" / "erqx" / "engine" / "ErqxBuild.scala"
+  if (!file.exists || !IO.read(file).contains(hash)) {
+    IO.write(file,
+      """ |package au.id.jazzy.erqx.engine
+          |
+          |object ErqxBuild {
+          |  val hash = "%s"
+          |}
+        """.stripMargin.format(hash))
+  }
+  Seq(file)
+}
+
+lazy val minimal = project.in(file("samples/minimal"))
+  .enablePlugins(PlayScala)
+  .dependsOn(root).aggregate(root)

@@ -1,3 +1,12 @@
+# Mazz blog
+It is an engineering blog which is powered by ERQX. And we want to do some updates here:
+- [prismic.io](http://prismic.io) backend integration.
+- Slick & MySQL storage instead of git repository.
+- Self-defined Cache support.
+
+# How to start
+First you need to exec `activator run` to start the application. Then you can list all the projects under this application by `projects`. BTW, you can switch to a specific project via `project [project-name]`, for example, `project minimal`. And then you can test your specified project on ["http://localhost:9000"](http://localhost:9000) after you exec `run` in your console.
+
 # The ERQX blog engine
 
 ERQX is an embeddable blog engine for Play Framework.
